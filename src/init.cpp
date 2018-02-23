@@ -99,7 +99,7 @@ void Shutdown()
     TRY_LOCK(cs_Shutdown, lockShutdown);
     if (!lockShutdown) return;
 
-    RenameThread("Linda-shutoff");
+    RenameThread("Alfa-shutoff");
     mempool.AddTransactionsUpdated(1);
     StopRPCThreads();
 #ifdef ENABLE_WALLET
@@ -170,8 +170,8 @@ std::string HelpMessage()
 {
     string strUsage = _("Options:") + "\n";
     strUsage += "  -?                     " + _("This help message") + "\n";
-    strUsage += "  -conf=<file>           " + _("Specify configuration file (default: Linda.conf)") + "\n";
-    strUsage += "  -pid=<file>            " + _("Specify pid file (default: Lindad.pid)") + "\n";
+    strUsage += "  -conf=<file>           " + _("Specify configuration file (default: Alfa.conf)") + "\n";
+    strUsage += "  -pid=<file>            " + _("Specify pid file (default: Alfad.pid)") + "\n";
     strUsage += "  -datadir=<dir>         " + _("Specify data directory") + "\n";
     strUsage += "  -wallet=<dir>          " + _("Specify wallet file (within data directory)") + "\n";
     strUsage += "  -dbcache=<n>           " + _("Set database cache size in megabytes (default: 25)") + "\n";
@@ -278,7 +278,7 @@ strUsage += "\n" + _("Masternode options:") + "\n";
     strUsage += "\n" + _("Darksend options:") + "\n";
     strUsage += "  -enabledarksend=<n>          " + _("Enable use of automated darksend for funds stored in this wallet (0-1, default: 0)") + "\n";
     strUsage += "  -darksendrounds=<n>          " + _("Use N separate masternodes to anonymize funds  (2-8, default: 2)") + "\n";
-    strUsage += "  -anonymizeLindaamount=<n> " + _("Keep N Linda anonymized (default: 0)") + "\n";
+    strUsage += "  -anonymizeAlfaamount=<n> " + _("Keep N Alfa anonymized (default: 0)") + "\n";
     strUsage += "  -liquidityprovider=<n>       " + _("Provide liquidity to Darksend by infrequently mixing coins on a continual basis (0-100, default: 0, 1=very frequent, high fees, 100=very infrequent, low fees)") + "\n";
 
     strUsage += "\n" + _("InstantX options:") + "\n";
@@ -491,7 +491,7 @@ bool AppInit2(boost::thread_group& threadGroup)
 
     // Sanity check
     if (!InitSanityCheck())
-        return InitError(_("Initialization sanity check failed. Linda is shutting down."));
+        return InitError(_("Initialization sanity check failed. Alfa is shutting down."));
 
     std::string strDataDir = GetDataDir().string();
 #ifdef ENABLE_WALLET
@@ -507,12 +507,12 @@ bool AppInit2(boost::thread_group& threadGroup)
     if (file) fclose(file);
     static boost::interprocess::file_lock lock(pathLockFile.string().c_str());
     if (!lock.try_lock())
-        return InitError(strprintf(_("Cannot obtain a lock on data directory %s. Linda is probably already running."), strDataDir));
+        return InitError(strprintf(_("Cannot obtain a lock on data directory %s. Alfa is probably already running."), strDataDir));
 
     if (GetBoolArg("-shrinkdebugfile", !fDebug))
         ShrinkDebugFile();
     LogPrintf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
-    LogPrintf("Linda version %s (%s)\n", FormatFullVersion(), CLIENT_DATE);
+    LogPrintf("Alfa version %s (%s)\n", FormatFullVersion(), CLIENT_DATE);
     LogPrintf("Using OpenSSL version %s\n", SSLeay_version(SSLEAY_VERSION));
     if (!fLogTimestamps)
         LogPrintf("Startup time: %s\n", DateTimeStrFormat("%x %H:%M:%S", GetTime()));
@@ -532,7 +532,7 @@ bool AppInit2(boost::thread_group& threadGroup)
     CMasterNode::minProtoVersion = GetArg("-masternodeminprotocol", MIN_MN_PROTO_VERSION);
 
     if (fDaemon)
-        fprintf(stdout, "Linda server starting\n");
+        fprintf(stdout, "Alfa server starting\n");
 
     int64_t nStart;
 
@@ -773,10 +773,10 @@ bool AppInit2(boost::thread_group& threadGroup)
                 InitWarning(msg);
             }
             else if (nLoadWalletRet == DB_TOO_NEW)
-                strErrors << _("Error loading wallet.dat: Wallet requires newer version of Linda") << "\n";
+                strErrors << _("Error loading wallet.dat: Wallet requires newer version of Alfa") << "\n";
             else if (nLoadWalletRet == DB_NEED_REWRITE)
             {
-                strErrors << _("Wallet needed to be rewritten: restart Linda to complete") << "\n";
+                strErrors << _("Wallet needed to be rewritten: restart Alfa to complete") << "\n";
                 LogPrintf("%s", strErrors.str());
                 return InitError(strErrors.str());
             }
@@ -925,15 +925,15 @@ bool AppInit2(boost::thread_group& threadGroup)
         nDarksendRounds = 99999;
     }
 
-    nAnonymizeLindaAmount = GetArg("-anonymizeLindaamount", 0);
-    if(nAnonymizeLindaAmount > 999999) nAnonymizeLindaAmount = 999999;
-    if(nAnonymizeLindaAmount < 2) nAnonymizeLindaAmount = 2;
+    nAnonymizeAlfaAmount = GetArg("-anonymizeAlfaamount", 0);
+    if(nAnonymizeAlfaAmount > 999999) nAnonymizeAlfaAmount = 999999;
+    if(nAnonymizeAlfaAmount < 2) nAnonymizeAlfaAmount = 2;
 
     bool fEnableInstantX = GetBoolArg("-enableinstantx", true);
     if(fEnableInstantX){
         nInstantXDepth = GetArg("-instantxdepth", 5);
         if(nInstantXDepth > 60) nInstantXDepth = 60;
-        if(nInstantXDepth < 0) nAnonymizeLindaAmount = 0;
+        if(nInstantXDepth < 0) nAnonymizeAlfaAmount = 0;
     } else {
         nInstantXDepth = 0;
     }
@@ -947,14 +947,14 @@ bool AppInit2(boost::thread_group& threadGroup)
     LogPrintf("fLiteMode %d\n", fLiteMode);
     LogPrintf("nInstantXDepth %d\n", nInstantXDepth);
     LogPrintf("Darksend rounds %d\n", nDarksendRounds);
-    LogPrintf("Anonymize Linda Amount %d\n", nAnonymizeLindaAmount);
+    LogPrintf("Anonymize Alfa Amount %d\n", nAnonymizeAlfaAmount);
 
     /* Denominations
        A note about convertability. Within Darksend pools, each denomination
        is convertable to another.
        For example:
-       1Linda+1000 == (.1Linda+100)*10
-       10Linda+10000 == (1Linda+1000)*10
+       1Alfa+1000 == (.1Alfa+100)*10
+       10Alfa+10000 == (1Alfa+1000)*10
     */
     darkSendDenominations.push_back( (100000      * COIN)+100000000 );    
     darkSendDenominations.push_back( (10000       * COIN)+10000000 );

@@ -1,8 +1,8 @@
-# Linda
+# Alfa
 
-![Linda](logo.png)
+![Alfa](logo.png)
 
-Linda is a PoW-PoS-based cryptocurrency.
+Alfa is a PoW-PoS-based cryptocurrency.
 
 Block Spacing: `90 Seconds`
 

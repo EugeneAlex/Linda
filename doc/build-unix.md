@@ -53,7 +53,7 @@ individual boost development packages, so the following can be used to only
 install necessary parts of boost:
 
     sudo apt-get install libboost-system-dev libboost-filesystem-dev libboost-chrono-dev libboost-program-options-dev libboost-test-dev libboost-thread-dev
-
+                                                       cd s
 If that doesn't work, you can install all boost development packages with:
 
     sudo apt-get install libboost-all-dev
@@ -121,7 +121,7 @@ Notes
 symbols, which reduces the executable size by about 90%.
 
 If you get an error about secp256k1
-cd secp256k1/
+cd secpmc256k1/
 ./autogen.sh
 ./configure.sh
 make
